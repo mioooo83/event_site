@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1番目は誰</title>
+    <style>
+        body {
+            background-color: #ffe4e1; /* 薄い赤 */
+            color: #333;
+            font-family: 'メイリオ', 'Arial', sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid #ff9999;
+        }
+        h1 {
+            color: #e74c3c;
+            font-size: 28px;
+            margin-top: 0;
+            text-shadow: 1px 1px 2px #fff;
+        }
+        .btn {
+            background-color: #27ae60; /* 緑 */
+            color: #fff; /* 白文字 */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #2ecc71;
+        }
+        p {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .result-name {
+            font-size: 36px; /* 他の文字の2倍の大きさ */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>最初にくじを引く人を決める</h1>
+        <button class="btn" onclick="decideFirst()">くじを引く人を決める</button>
+        <p id="firstPerson"></p>
+    </div>
+
+    <script>
+        const participants = ["こしお", "ほのか", "ゆかち", "あきこ", "ゆうな", "ましゅ", "みしま", "しゅん", "だいき", "かずき", "たけむら", "ぴろ", "ちたつ", "じょこ", "あかぎ", "おざざ"];
+
+        function decideFirst() {
+            const randomIndex = Math.floor(Math.random() * participants.length);
+            const firstPerson = participants[randomIndex];
+            document.getElementById('firstPerson').innerHTML = `最初にくじを引く人は <span class="result-name">${firstPerson}</span> さんです！`;
+        }
+    </script>
+</body>
+</html>

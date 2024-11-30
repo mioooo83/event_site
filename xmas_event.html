@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>K.G.WinG25th-ChristmasParty</title>
+    <style>
+        body {
+            background-color: #ffe4e1; /* 薄い赤 */
+            color: #333;
+            font-family: 'メイリオ', 'Arial', sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            border: 2px solid #ff9999;
+        }
+        h1 {
+            color: #e74c3c;
+            font-size: 28px;
+            margin-top: 0;
+            text-shadow: 1px 1px 2px #fff;
+        }
+        .btn {
+            background-color: #27ae60; /* 緑 */
+            color: #fff; /* 白文字 */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #2ecc71;
+        }
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #27ae60; /* 緑 */
+            color: #fff; /* 白文字 */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        .home-btn:hover {
+            background-color: #2ecc71;
+        }
+        select, option {
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        p {
+            font-size: 18px;
+        }
+        .result-name {
+            font-size: 36px; /* 他の文字の2倍 */
+            font-weight: bold;
+        }
+        .results {
+            margin-top: 30px;
+            text-align: left;
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .results th, .results td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .results th {
+            background-color: #27ae60; /* 緑 */
+            color: white;
+            text-align: center;
+        }
+        .complete-message {
+            font-size: 24px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            display: none; /* 初期状態では非表示 */
+        }
+    </style>
+</head>
+<body>
+    <button class="home-btn" onclick="resetPage()">ホームページ</button>
+    <div class="container">
+        <h1>K.G.WinG25th クリスマスプレゼント交換会</h1>
+        <select id="nameInput">
+            <option value="">あなたの名前を選んでください</option>
+            <option value="こしお">こしお</option>
+            <option value="ほのか">ほのか</option>
+            <option value="ゆかち">ゆかち</option>
+            <option value="あきこ">あきこ</option>
+            <option value="ゆうな">ゆうな</option>
+            <option value="ましゅ">ましゅ</option>
+            <option value="みしま">みしま</option>
+            <option value="しゅん">しゅん</option>
+            <option value="だいき">だいき</option>
+            <option value="かずき">かずき</option>
+            <option value="たけむら">たけむら</option>
+            <option value="ぴろ">ぴろ</option>
+            <option value="ちたつ">ちたつ</option>
+            <option value="じょこ">じょこ</option>
+            <option value="あかぎ">あかぎ</option>
+            <option value="おざざ">おざざ</option>
+        </select>
+        <button class="btn" onclick="draw()">抽選を開始</button>
+        <p id="result"></p>
+        <div id="completionMessage" class="complete-message">プレゼント交換終了！</div>
+        <table class="results" id="results">
+            <thead>
+                <tr>
+                    <th>送り手</th>
+                    <th>受け手</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const participants = ["こしお", "ほのか", "ゆかち", "あきこ", "ゆうな", "ましゅ", "みしま", "しゅん", "だいき", "かずき", "たけむら", "ぴろ", "ちたつ", "じょこ", "あかぎ","おざざ"];
+        const assignments = JSON.parse(localStorage.getItem('assignments')) || {};
+        const resultsList = JSON.parse(localStorage.getItem('resultsList')) || [];
+        let attempts = 0;
+
+        function draw() {
+            const name = document.getElementById('nameInput').value;
+            if (!name) {
+                alert('名前を選んでください');
+                return;
+            }
+            if (assignments[name]) {
+                alert(`${name} さんは既に引きました`);
+                return;
+            }
+            const filteredParticipants = participants.filter(participant => participant !== name && !Object.keys(assignments).includes(participant));
+            if (filteredParticipants.length === 0) {
+                // 最後の人がプレゼントを渡す相手を最初の人に設定
+                const firstParticipant = Object.keys(assignments)[0];
+                assignments[name] = firstParticipant;
+                localStorage.setItem('assignments', JSON.stringify(assignments));
+                resultsList.push({ sender: name, receiver: firstParticipant });
+                localStorage.setItem('resultsList', JSON.stringify(resultsList));
+                document.getElementById('result').innerHTML = `あなたのプレゼント相手は <span class="result-name">${firstParticipant}</span> さんです！`;
+                updateResults();
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * filteredParticipants.length);
+            const result = filteredParticipants[randomIndex];
+            if (!result) {
+                alert('有効な結果が得られませんでした。再度試してください。');
+                return;
+            }
+            assignments[name] = result;
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            resultsList.push({ sender: name, receiver: result });
+            localStorage.setItem('resultsList', JSON.stringify(resultsList));
+            attempts++;
+            document.getElementById('result').innerHTML = `あなたのプレゼント相手は <span class="result-name">${result}</span> さんです！`;
+            updateResults();
+        }
+
+        function updateResults() {
+            const resultsTableBody = document.getElementById('results').getElementsByTagName('tbody')[0];
+            resultsTableBody.innerHTML = '';
+            resultsList.forEach(item => {
+                const row = document.createElement('tr');
+                const senderCell = document.createElement('td');
+                senderCell.textContent = item.sender;
+                const receiverCell = document.createElement('td');
+                receiverCell.textContent = item.receiver;
+                row.appendChild(senderCell);
+                row.appendChild(receiverCell);
+                resultsTableBody.appendChild(row);
+            });
+
+            // 全員のプレゼント交換が終了したらメッセージを表示
+            if (resultsList.length === participants.length) {
+                document.getElementById('completionMessage').style.display = 'block';
+            }
+        }
+
+        function resetPage() {
+            localStorage.removeItem('assignments');
+            localStorage.removeItem('resultsList');
+            document.getElementById('nameInput').value = "";
+            document.getElementById('result').innerText = "";
+            location.reload();
+        }
+
+        window.onload = function() {
+            if (Object.keys(assignments).length > 0) {
+                document.getElementById('result').innerText = '前回の抽選結果が残っています。';
+            }
+            updateResults();
+        }
+    </script>
+</body>
+</html>
