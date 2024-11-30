@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.G.WinG25th クリスマスプレゼント交換会</title>
+    <style>
+        body {
+            background-color: #f8f8f8;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            color: #e74c3c;
+            font-size: 24px;
+        }
+        .btn {
+            background-color: #27ae60;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #2ecc71;
+        }
+        .home-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .home-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>K.G.WinG25th クリスマスプレゼント交換会</h1>
+        <select id="nameInput">
+            <option value="">あなたの名前を選んでください</option>
+            <option value="こしお">こしお</option>
+            <option value="ほのか">ほのか</option>
+            <option value="ゆかち">ゆかち</option>
+            <option value="あきこ">あきこ</option>
+            <option value="ゆうな">ゆうな</option>
+            <option value="ましゅ">ましゅ</option>
+            <option value="みしま">みしま</option>
+            <option value="しゅん">しゅん</option>
+            <option value="だいき">だいき</option>
+            <option value="かずき">かずき</option>
+            <option value="たけむら">たけむら</option>
+            <option value="ぴろ">ぴろ</option>
+            <option value="ちたつ">ちたつ</option>
+            <option value="じょこ">じょこ</option>
+            <option value="あかぎ">あかぎ</option>
+            <option value="おざざ">おざざ</option>
+        </select>
+        <button class="btn" onclick="draw()">抽選を開始</button>
+        <button class="home-btn" onclick="resetPage()">ホームページ</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        const participants = ["こしお", "ほのか", "ゆかち", "あきこ", "ゆうな", "ましゅ", "みしま", "しゅん", "だいき", "かずき", "たけむら", "ぴろ", "ちたつ", "じょこ", "あかぎ","おざざ"];
+        const assignments = JSON.parse(localStorage.getItem('assignments')) || {};
+        let attempts = 0;
+
+        function draw() {
+            const name = document.getElementById('nameInput').value;
+            if (!name) {
+                alert('名前を選んでください');
+                return;
+            }
+            if (assignments[name]) {
+                alert(`${name} さんは既に引きました`);
+                return;
+            }
+            const filteredParticipants = participants.filter(participant => participant !== name && !Object.values(assignments).includes(participant));
+            if (filteredParticipants.length === 0) {
+                alert('全員引き終わりました');
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * filteredParticipants.length);
+            const result = filteredParticipants[randomIndex];
+            if (!result) {
+                alert('有効な結果が得られませんでした。再度試してください。');
+                return;
+            }
+            assignments[name] = result;
+            localStorage.setItem('assignments', JSON.stringify(assignments));
+            attempts++;
+            document.getElementById('result').innerText = `あなたのプレゼント相手は ${result} さんです！`;
+        }
+
+        function resetPage() {
+            localStorage.removeItem('assignments');
+            document.getElementById('nameInput').value = "";
+            document.getElementById('result').innerText = "";
+            location.reload();
+        }
+
+        window.onload = function() {
+            if (Object.keys(assignments).length > 0) {
+                document.getElementById('result').innerText = '前回の抽選結果が残っています。';
+            }
+        }
+    </script>
+</body>
+</html>
