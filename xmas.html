@@ -18,6 +18,7 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
         }
         h1 {
             color: #e74c3c;
@@ -33,6 +34,20 @@
         }
         .btn:hover {
             background-color: #2ecc71;
+        }
+        .home-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .home-btn:hover {
+            background-color: #2980b9;
         }
     </style>
 </head>
@@ -59,12 +74,13 @@
             <option value="おざざ">おざざ</option>
         </select>
         <button class="btn" onclick="draw()">抽選を開始</button>
+        <button class="home-btn" onclick="resetPage()">ホームページ</button>
         <p id="result"></p>
     </div>
 
     <script>
         const participants = ["こしお", "ほのか", "ゆかち", "あきこ", "ゆうな", "ましゅ", "みしま", "しゅん", "だいき", "かずき", "たけむら", "ぴろ", "ちたつ", "じょこ", "あかぎ","おざざ"];
-        const assignments = {};
+        const assignments = JSON.parse(localStorage.getItem('assignments')) || {};
         let attempts = 0;
 
         function draw() {
@@ -75,10 +91,6 @@
             }
             if (assignments[name]) {
                 alert(`${name} さんは既に引きました`);
-                return;
-            }
-            if (attempts >= participants.length * 2) {
-                alert('抽選が完了しました');
                 return;
             }
             const filteredParticipants = participants.filter(participant => participant !== name && !Object.values(assignments).includes(participant));
@@ -93,8 +105,22 @@
                 return;
             }
             assignments[name] = result;
+            localStorage.setItem('assignments', JSON.stringify(assignments));
             attempts++;
             document.getElementById('result').innerText = `あなたのプレゼント相手は ${result} さんです！`;
+        }
+
+        function resetPage() {
+            localStorage.removeItem('assignments');
+            document.getElementById('nameInput').value = "";
+            document.getElementById('result').innerText = "";
+            location.reload();
+        }
+
+        window.onload = function() {
+            if (Object.keys(assignments).length > 0) {
+                document.getElementById('result').innerText = '前回の抽選結果が残っています。';
+            }
         }
     </script>
 </body>
